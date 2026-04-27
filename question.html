@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Baby Care Assistant - Tiny Tide</title>
+    <style>
+        /* Keeping your original styling */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 20px; }
+        .container { max-width: 900px; margin: 0 auto; }
+        .header { text-align: center; color: white; margin-bottom: 40px; }
+        .main-card { background: white; border-radius: 20px; padding: 30px; box-shadow: 0 15px 35px rgba(0,0,0,0.2); }
+        .profile-summary { background: #f8f9ff; padding: 15px; border-radius: 12px; margin-bottom: 25px; border-left: 5px solid #667eea; display: flex; justify-content: space-between; align-items: center; }
+        .input-group { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 8px; font-weight: 600; color: #444; }
+        textarea { width: 100%; padding: 15px; border: 2px solid #e0e0e0; border-radius: 12px; font-size: 16px; resize: vertical; min-height: 120px; transition: 0.3s; }
+        textarea:focus { outline: none; border-color: #667eea; }
+        .btn-ask { background: #667eea; color: white; border: none; padding: 15px 30px; border-radius: 10px; font-size: 18px; font-weight: 600; cursor: pointer; width: 100%; transition: 0.3s; }
+        .btn-ask:disabled { background: #ccc; }
+        .answer-box { margin-top: 30px; padding: 20px; border-radius: 12px; background: #f0f4ff; display: none; border: 1px solid #d0d9ff; }
+        .answer-box.show { display: block; animation: fadeIn 0.5s ease; }
+        .loading { font-style: italic; color: #666; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+    <div id="dashboard" class="dashboard" style="display: block;">
+    <div class="dashboard-header">
+        <div>
+            <h2 id="babyNameDisplay">👶 Baby: Loading...</h2>
+        </div>
+        <button onclick="logout()" class="logout-btn">Logout</button>
+    </div>
+
+    <div class="main-grid">
+         </div>
+</div>
+    <div class="container">
+        <div class="header">
+            <h1>🌊 Tiny Tide AI</h1>
+            <p>Smart Baby Care Assistant</p>
+        </div>
+
+        <div class="main-card">
+            <div class="profile-summary">
+                <div>
+                    <strong id="babyDisplayName">Baby: Loading...</strong><br>
+                    <span id="babyDetailLines">Retrieving details from cloud...</span>
+                </div>
+                <button onclick="location.href='mainpage.html'" style="background:none; border:1px solid #667eea; padding:5px 10px; border-radius:5px; cursor:pointer; color:#667eea">Edit Profile</button>
+            </div>
+
+            <div class="input-group">
+                <label for="question">What's on your mind today?</label>
+                <textarea id="question" placeholder="e.g., My baby isn't sleeping well today, any tips? or How much should a 4-month-old eat?"></textarea>
+            </div>
+
+            <button class="btn-ask" id="askBtn" onclick="askAI()">Ask AI Assistant</button>
+
+            <div id="answerBox" class="answer-box">
+                <h3 style="color: #4a5f9d; margin-bottom: 10px;">Assistant Response:</h3>
+                <div id="answerText"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // On Page Load: Load baby info from LocalStorage (set during Login)
+        window.onload = function() {
+            const babyName = localStorage.getItem('babyName') || "Your Baby";
+            const token = localStorage.getItem('token');
+
+            if (!token) {
+                alert("Please login first to use the AI.");
+                location.href = 'feeding.html'; // Redirect to login
+                return;
+            }
+
+            document.getElementById('babyDisplayName').innerText = `👶 Baby: ${babyName}`;
+            document.getElementById('babyDetailLines').innerText = "Personalized context enabled via Cloud Sync.";
+        };
+
+        async function askAI() {
+            const questionInput = document.getElementById('question');
+            const question = questionInput.value.trim();
+            const askBtn = document.getElementById('askBtn');
+            const answerBox = document.getElementById('answerBox');
+            const answerText = document.getElementById('answerText');
+
+            if (!question) {
+                alert("Please enter a question!");
+                return;
+            }
+
+            // UI State: Loading
+            askBtn.disabled = true;
+            questionInput.disabled = true;
+            answerBox.classList.add('show');
+            answerText.innerHTML = '<div class="loading">🤔 Consulting Tiny Tide AI...</div>';
+
+            try {
+                // Send request to your Node.js Backend
+                const response = await fetch('http://localhost:3000/api/ask-ai', {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('token')}` 
+                    },
+                    body: JSON.stringify({ 
+                        question: question,
+                        babyName: localStorage.getItem('babyName') 
+                    })
+                });
+
+                const data = await response.json();
+                
+                if (data.answer) {
+                    // Use innerHTML to allow for formatted responses from AI
+                    answerText.innerHTML = data.answer.replace(/\n/g, '<br>');
+                } else {
+                    answerText.innerHTML = '❌ <span style="color:red">Error: ' + (data.error || 'Server issue') + '</span>';
+                }
+            } catch (error) {
+                console.error('Connection Error:', error);
+                answerText.innerHTML = '❌ <strong>Connection failed.</strong> Ensure your backend server is running on port 3000.';
+            } finally {
+                askBtn.disabled = false;
+                questionInput.disabled = false;
+            }
+        }
+    </script>
+</body>
+</html>

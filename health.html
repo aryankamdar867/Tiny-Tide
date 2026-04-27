@@ -1,0 +1,249 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tiny Tide - Health Tracking</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .container {
+            max-width: 900px;
+            width: 100%;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .health-card {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+        }
+
+        .form-group input, .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1em;
+        }
+
+        .form-group input:focus, .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1em;
+            cursor: pointer;
+            font-weight: 600;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102,126,234,0.4);
+        }
+
+        #adviceBox {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 10px;
+            font-size: 1em;
+            text-align: center;
+            display: none;
+        }
+
+        .record {
+            background: #f8f9fa;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+        }
+
+        .record strong {
+            color: #667eea;
+        }
+
+        @media (max-width: 768px) {
+            .health-card {
+                padding: 25px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🌊 Tiny Tide Health Tracking</h1>
+            <p>Track your baby's health records</p>
+        </div>
+
+        <div class="health-card">
+            <form id="healthForm">
+                <div class="form-group">
+                    <label for="date">Date</label>
+                    <input type="date" id="date" required>
+                </div>
+                <div class="form-group">
+                    <label for="temp">Temperature (°C)</label>
+                    <input type="number" step="0.1" id="temp" placeholder="e.g., 36.5">
+                </div>
+                <div class="form-group">
+                    <label for="symptoms">Symptoms or Notes</label>
+                    <textarea id="symptoms" rows="3" placeholder="e.g., Mild fever, cough"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="visit">Doctor Visit Notes</label>
+                    <textarea id="visit" rows="3" placeholder="e.g., Prescribed paracetamol"></textarea>
+                </div>
+                <button type="submit" class="btn">Save Record</button>
+            </form>
+
+            <div id="adviceBox"></div>
+
+            <h2 style="text-align: center; margin-top: 40px; color: #667eea;">Health History</h2>
+            <div id="recordsList"></div>
+        </div>
+    </div>
+
+    
+        <script>
+    const form = document.getElementById('healthForm');
+    const list = document.getElementById('recordsList');
+    const adviceBox = document.getElementById('adviceBox');
+    const token = localStorage.getItem('token'); // Get token from login
+
+    // 1. Load Records from Database
+    async function loadRecords() {
+        if (!token) {
+            window.location.href = 'login.html'; // Redirect if not logged in
+            return;
+        }
+
+        try {
+            const response = await fetch('http://localhost:3000/api/health', {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            const records = await response.json();
+
+            list.innerHTML = '';
+            if (!records || records.length === 0) {
+                list.innerHTML = '<p style="text-align:center;color:#666;">No health records yet</p>';
+                return;
+            }
+
+            [...records].reverse().forEach(r => {
+                const div = document.createElement('div');
+                div.className = 'record';
+                div.innerHTML = `
+                    <strong>${new Date(r.date).toLocaleDateString()}</strong><br>
+                    Temperature: ${r.temp ?? '-'} °C<br>
+                    Symptoms: ${r.symptoms || 'None noted'}<br>
+                    Doctor Notes: ${r.visit || 'None'}
+                `;
+                list.appendChild(div);
+            });
+        } catch (error) {
+            console.error("Error loading records:", error);
+        }
+    }
+
+    // 2. Save Record to Database
+    form.addEventListener('submit', async function (e) {
+        e.preventDefault();
+
+        const recordData = {
+            date: document.getElementById('date').value,
+            temp: document.getElementById('temp').value ? Number(document.getElementById('temp').value) : null,
+            symptoms: document.getElementById('symptoms').value.trim(),
+            visit: document.getElementById('visit').value.trim()
+        };
+
+        try {
+            const response = await fetch('http://localhost:3000/api/health', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify(recordData)
+            });
+
+            if (response.ok) {
+                // Show Advice Logic
+                showAdvice(recordData.temp);
+                form.reset();
+                loadRecords(); // Refresh list
+            }
+        } catch (error) {
+            alert("Failed to save to database");
+        }
+    });
+
+    function showAdvice(temp) {
+        adviceBox.style.display = "block";
+        if (temp >= 38) {
+            adviceBox.style.background = "#fee2e2";
+            adviceBox.style.color = "#e74c3c";
+            adviceBox.textContent = "⚠️ High temperature detected. Consult a doctor immediately.";
+        } else {
+            adviceBox.style.background = "#f0f4ff";
+            adviceBox.style.color = "#667eea";
+            adviceBox.textContent = "Record saved to database. Continue monitoring.";
+        }
+    }
+
+    loadRecords();
+
+    </script>
+</body>
+</html>

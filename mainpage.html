@@ -1,0 +1,944 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tiny Tide - Your Newborn Care Companion</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            overflow-x: hidden;
+        }
+
+        /* Header & Navigation */
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1rem 0;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .logo {
+            font-size: 2rem;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .logo span {
+            font-size: 2.5rem;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+        }
+
+        nav a:hover {
+            background: rgba(255,255,255,0.2);
+        }
+
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 150px 2rem 100px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"><path fill="rgba(255,255,255,0.1)" d="M0,96L48,112C96,128,192,160,288,160C384,160,480,128,576,122.7C672,117,768,139,864,138.7C960,139,1056,117,1152,101.3C1248,85,1344,75,1392,69.3L1440,64L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path></svg>') no-repeat bottom;
+            background-size: cover;
+        }
+
+        .hero-content {
+            max-width: 800px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            margin-bottom: 1rem;
+            animation: fadeInUp 1s ease;
+        }
+
+        .hero p {
+            font-size: 1.3rem;
+            margin-bottom: 2rem;
+            opacity: 0.95;
+            animation: fadeInUp 1s ease 0.2s backwards;
+        }
+
+        .cta-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            animation: fadeInUp 1s ease 0.4s backwards;
+        }
+
+        .btn {
+            padding: 1rem 2.5rem;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+            font-weight: 600;
+        }
+
+        .btn-primary {
+            background: white;
+            color: #667eea;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: white;
+            border: 2px solid white;
+        }
+
+        .btn-secondary:hover {
+            background: white;
+            color: #667eea;
+        }
+
+        /* Features Section */
+        .features {
+            padding: 80px 2rem;
+            background: #f8f9fa;
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .section-title h2 {
+            font-size: 2.5rem;
+            color: #667eea;
+            margin-bottom: 0.5rem;
+        }
+
+        .section-title p {
+            font-size: 1.1rem;
+            color: #666;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .feature-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: all 0.3s;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(102,126,234,0.3);
+        }
+
+        .feature-icon {
+            font-size: 3.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .feature-card h3 {
+            color: #667eea;
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+        }
+
+        .feature-card p {
+            color: #666;
+            line-height: 1.8;
+        }
+
+        /* Problem & Solution Section */
+        .problem-solution {
+            padding: 80px 2rem;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        }
+
+        .content-wrapper {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+            align-items: center;
+        }
+
+        .problem-box, .solution-box {
+            background: white;
+            padding: 2.5rem;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+
+        .problem-box {
+            border-left: 5px solid #e74c3c;
+        }
+
+        .solution-box {
+            border-left: 5px solid #27ae60;
+        }
+
+        .problem-box h3, .solution-box h3 {
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .problem-box h3 {
+            color: #e74c3c;
+        }
+
+        .solution-box h3 {
+            color: #27ae60;
+        }
+
+        .problem-box ul, .solution-box ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .problem-box li, .solution-box li {
+            padding: 0.8rem 0;
+            padding-left: 2rem;
+            position: relative;
+        }
+
+        .problem-box li::before {
+            content: '⚠️';
+            position: absolute;
+            left: 0;
+        }
+
+        .solution-box li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: #27ae60;
+            font-weight: bold;
+            font-size: 1.3rem;
+        }
+
+        /* Technology Section */
+        .technology {
+            padding: 80px 2rem;
+            background: white;
+        }
+
+        .tech-grid {
+            max-width: 1000px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+        }
+
+        .tech-item {
+            text-align: center;
+            padding: 2rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 15px;
+            transition: all 0.3s;
+        }
+
+        .tech-item:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 30px rgba(102,126,234,0.4);
+        }
+
+        .tech-item h4 {
+            font-size: 1.3rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .tech-item p {
+            font-size: 0.95rem;
+            opacity: 0.9;
+        }
+
+        /* Team Section */
+        .team {
+            padding: 80px 2rem;
+            background: #f8f9fa;
+        }
+
+        .team-grid {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+        }
+
+        .team-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: all 0.3s;
+        }
+
+        .team-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(102,126,234,0.3);
+        }
+
+        .team-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin: 0 auto 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            color: white;
+        }
+
+        .team-card h4 {
+            color: #667eea;
+            margin-bottom: 0.5rem;
+            font-size: 1.3rem;
+        }
+
+        .team-card p {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        /* Download Section */
+        .download {
+            padding: 80px 2rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-align: center;
+        }
+
+        .download h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .download p {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+            opacity: 0.95;
+        }
+
+        .app-buttons {
+            display: flex;
+            gap: 1.5rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .app-btn {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem 2rem;
+            background: white;
+            color: #667eea;
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .app-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+
+        .app-btn span {
+            font-size: 2rem;
+        }
+
+        /* Footer */
+        footer {
+            background: #2c3e50;
+            color: white;
+            padding: 3rem 2rem 1rem;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .footer-section h3 {
+            color: #667eea;
+            margin-bottom: 1rem;
+        }
+
+        .footer-section p, .footer-section a {
+            color: #bdc3c7;
+            text-decoration: none;
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        .footer-section a:hover {
+            color: white;
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 2rem;
+            border-top: 1px solid #34495e;
+            color: #95a5a6;
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .hero p {
+                font-size: 1.1rem;
+            }
+
+            .cta-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .content-wrapper {
+                grid-template-columns: 1fr;
+            }
+
+            nav ul {
+                display: none;
+            }
+
+            .app-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+       /* Registration Section Blending Styles */
+#registerSection {
+    background: white;
+    border-radius: 20px;
+    padding: 3rem;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    max-width: 500px; /* Slightly wider to accommodate baby details */
+    margin: 2rem auto;
+    animation: slideIn 0.5s ease;
+}
+
+#registerSection h2 {
+    color: #667eea;
+    margin-bottom: 0.5rem;
+    font-size: 2rem;
+    text-align: center;
+}
+
+#registerSection p {
+    color: #666;
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+/* Flex layout for Baby Name and DOB to keep the form compact */
+.form-row {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 1.5rem;
+}
+
+.form-row .form-group {
+    flex: 1;
+    margin-bottom: 0;
+}
+
+/* Re-applying your original input & button styles to this section */
+#registerSection .form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: #333;
+    font-weight: 600;
+}
+
+#registerSection input {
+    width: 100%;
+    padding: 1rem;
+    border: 2px solid #e0e0e0;
+    border-radius: 10px;
+    font-size: 1rem;
+    transition: all 0.3s;
+}
+
+#registerSection input:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102,126,234,0.1);
+}
+
+#registerSection .btn-login {
+    width: 100%;
+    padding: 1rem;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+#registerSection .btn-login:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(102,126,234,0.4);
+}
+    
+    </style>
+</head>
+<body>
+   <div id="registerSection" class="login-card" style="margin-top: 2rem;">
+    <h2>Join Tiny Tide</h2>
+    <p>Start tracking your baby's health journey</p>
+    
+    <form id="registerForm">
+        <div class="form-group">
+            <label>Parent Name</label>
+            <input type="text" id="regParentName" placeholder="Enter your name" required>
+        </div>
+        <div class="form-group">
+            <label>Email Address</label>
+            <input type="email" id="regEmail" placeholder="Enter your email" required>
+        </div>
+        <div class="form-group">
+            <label>Password</label>
+            <input type="password" id="regPassword" placeholder="Create a password" required>
+        </div>
+        <div class="form-group">
+            <label>Baby's Name</label>
+            <input type="text" id="regBabyName" placeholder="Baby's name" required>
+        </div>
+        <div class="form-group">
+            <label>Baby's Date of Birth</label>
+            <input type="date" id="regBabyDOB" required>
+        </div>
+        
+        <button type="submit" class="btn-login">Create Account</button>
+    </form>
+</div>
+
+<script>
+    document.getElementById('registerForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    // Collect data from the form
+    const registrationData = {
+        name: document.getElementById('regParentName').value,
+        email: document.getElementById('regEmail').value,
+        password: document.getElementById('regPassword').value,
+        babyName: document.getElementById('regBabyName').value,
+        babyDOB: document.getElementById('regBabyDOB').value
+    };
+
+    try {
+        const response = await fetch('http://localhost:3000/api/register', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(registrationData)
+        });
+
+        const result = await response.json();
+
+        if (response.ok) {
+            alert('Account created successfully! You can now login.');
+            document.getElementById('registerForm').reset();
+            // Optional: Smoothly scroll to the login section
+            document.getElementById('loginSection').scrollIntoView({ behavior: 'smooth' });
+        } else {
+            alert('Registration failed: ' + result.error);
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Could not connect to the database server.');
+    }
+});
+async function handleRegister() {
+    const email = document.getElementById('regEmail').value;
+    const password = document.getElementById('regPass').value;
+    const babyName = document.getElementById('regBaby').value;
+
+    const response = await fetch('http://localhost:3000/api/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password, babyName })
+    });
+
+    const data = await response.json();
+    if (data.token) {
+        localStorage.setItem('token', data.token);
+        alert("Success! You are now connected to the Cloud.");
+    }
+}
+</script>
+    <!-- Header -->
+    <header>
+        <nav>
+            <div class="logo">
+                <span>🌊</span>
+                <span>Tiny Tide</span>
+            </div>
+            <ul>
+                <li><a href="#home">Home</a></li>
+                <li><a href="#features">Features</a></li>
+                <li><a href="#technology">Technology</a></li>
+                <li><a href="#team">Team</a></li>
+                <li><a href="#download">Download</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section id="home" class="hero">
+        <div class="hero-content">
+            <h1>Welcome to Tiny Tide</h1>
+            <p>Your trusted companion for newborn care. Track, manage, and nurture your baby's health journey with confidence and ease.</p>
+            <div class="cta-buttons">
+                <a href="#download" class="btn btn-primary">Download Now</a>
+                <a href="#features" class="btn btn-secondary">Learn More</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="features">
+        <div class="section-title">
+            <h2>Everything You Need for Baby Care</h2>
+            <p>Comprehensive tools designed to make parenting easier</p>
+        </div>
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">👶</div>
+                <a href="http://127.0.0.1:5501/notifications.html"><h3>Notifications</h3></a>
+                <p>Create detailed profiles for multiple children with photos, birth details, and medical information.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon"><a href="http://127.0.0.1:5501/feeding.html">🍼</a></div>
+                <h3>Feeding Tracker</h3>
+                <p>Log breastfeeding and bottle feeding sessions with time, duration, and quantity details.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">😴</div>
+               <a href="http://127.0.0.1:5501/sleep.html"><h3>Sleep Monitor</h3></a>
+                <p>Track nap times and night sleep patterns with easy start/stop timers.Also get AI insights</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🩺</div>
+                <a href="http://127.0.0.1:5501/health.html"><h3>Health Tracking</h3></a>    
+                <p>Record temperature, vaccinations, doctor visits, and important health milestones.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon"><a href="http://127.0.0.1:5501/vaccine.html">💉</a></div>
+                <h3>Vaccination Reminders</h3>
+                <p>Automatic vaccine schedules with push notifications to never miss an important date.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">📊</div>
+                <a href="http://127.0.0.1:5501/question.html"><h3>QUESTIONS</h3></a>
+                <p>Ask all your queries to our personlised AI chatbot</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon"><img src="data:image/png;base64,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" alt=""></div>
+                <a href="http://127.0.0.1:5501/emergency.html"><h3>EMERGENCY</h3></a>
+                <p>Get Help! In any Emergency Situation</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">📄</div>
+                <h3>PDF Reports</h3>
+                <p>Export comprehensive health reports for pediatric visits and record-keeping.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Problem & Solution Section -->
+    <section class="problem-solution">
+        <div class="section-title">
+            <h2>Why Tiny Tide?</h2>
+            <p>Addressing the real challenges parents face</p>
+        </div>
+        <div class="content-wrapper">
+            <div class="problem-box">
+                <h3>The Challenge</h3>
+                <ul>
+                    <li>Managing daily routines of newborns is overwhelming</li>
+                    <li>Lack of experience leads to forgotten feeding times</li>
+                    <li>Missing vaccination schedules due to poor tracking</li>
+                    <li>No organized system for health records</li>
+                    <li>Stress from juggling multiple baby care tasks</li>
+                </ul>
+            </div>
+            <div class="solution-box">
+                <h3>Our Solution</h3>
+                <ul>
+                    <li>Simple, intuitive app for daily routine management</li>
+                    <li>Automated reminders for all important activities</li>
+                    <li>Complete vaccination tracking with notifications</li>
+                    <li>Digital health records accessible anytime</li>
+                    <li>Peace of mind with organized baby care</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- Technology Section -->
+    <section id="technology" class="technology">
+        <div class="section-title">
+            <h2>Built with Modern Technology</h2>
+            <p>Cross-platform app using cutting-edge frameworks</p>
+        </div>
+        <div class="tech-grid">
+            <div class="tech-item">
+                <h4>Flutter</h4>
+                <p>Beautiful UI Framework</p>
+            </div>
+            <div class="tech-item">
+                <h4>Firebase</h4>
+                <p>Real-time Database</p>
+            </div>
+            <div class="tech-item">
+                <h4>Dart</h4>
+                <p>Programming Language</p>
+            </div>
+            <div class="tech-item">
+                <h4>Cloud Storage</h4>
+                <p>Secure Data Sync</p>
+            </div>
+            <div class="tech-item">
+                <h4>Push Notifications</h4>
+                <p>Timely Reminders</p>
+            </div>
+            <div class="tech-item">
+                <h4>Cross-Platform</h4>
+                <p>Android & iOS</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Team Section -->
+    <section id="team" class="team">
+        <div class="section-title">
+            <h2>Meet Our Team</h2>
+            <p>CS-F Department, Vishwakarma Institute of Technology</p>
+        </div>
+        <div class="team-grid">
+            <div class="team-card">
+                <div class="team-avatar">CK</div>
+                <h4>Chirag Kalwani</h4>
+                <p>Roll No: 1070606</p>
+                <p>Developer</p>
+            </div>
+            <div class="team-card">
+                <div class="team-avatar">RK</div>
+                <h4>Rudhira Kamble</h4>
+                <p>Roll No: 1070607</p>
+                <p>Developer</p>
+            </div>
+            <div class="team-card">
+                <div class="team-avatar">SK</div>
+                <h4>Sanket Kamble</h4>
+                <p>Roll No: 1070608</p>
+                <p>Developer</p>
+            </div>
+            <div class="team-card">
+                <div class="team-avatar">SK</div>
+                <h4>Punishk Kamdi</h4>
+                <p>Roll No: 1070610</p>
+                <p>Developer</p>
+            </div>
+            <div class="team-card">
+                <div class="team-avatar">AK</div>
+                <h4>Aryan Kamdar</h4>
+                <p>Roll No: 1070609</p>
+                <p>Developer</p>
+            </div>
+            <div class="team-
+            <div class="team-card" style="grid-column: span 1;">
+                <div class="team-avatar">SD</div>
+                <h4>Prof. Sanyukta Deshmukh</h4>
+                <p>Project Guide</p>
+                <p>VIT, Pune</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Download Section -->
+    <section id="download" class="download">
+        <h2>Download Tiny Tide Today</h2>
+        <p>Available on Android and iOS - Start your stress-free parenting journey</p>
+        <div class="app-buttons">
+            <a href="#" class="app-btn">
+                <span>📱</span>
+                <div style="text-align: left;">
+                    <small>Download on</small><br>
+                    <strong>Google Play</strong>
+                </div>
+            </a>
+            <a href="#" class="app-btn">
+                <span>🍎</span>
+                <div style="text-align: left;">
+                    <small>Download on</small><br>
+                    <strong>App Store</strong>
+                </div>
+            </a>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>About Tiny Tide</h3>
+                <p>A mobile application designed to help new parents manage newborn care routines efficiently and confidently.</p>
+            </div>
+            <div class="footer-section">
+                <h3>Quick Links</h3>
+                <a href="#features">Features</a>
+                <a href="#technology">Technology</a>
+                <a href="#team">Team</a>
+                <a href="#download">Download</a>
+            </div>
+            <div class="footer-section">
+                <h3>Project Details</h3>
+                <p>Academic Year: 2025-26</p>
+                <p>Department: DESH, CS-F</p>
+                <p>VIT, Pune</p>
+            </div>
+            <div class="footer-section">
+                <h3>Contact</h3>
+                <p>Guide: Prof. Sanyukta Deshmukh</p>
+                <p>sanyukta.deshmukh@vit.edu</p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2025 Tiny Tide - Newborn Care Assistant. All Rights Reserved.</p>
+            <p>Vishwakarma Institute of Technology, Pune</p>
+        </div>
+    </footer>
+
+    <script>
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Add animation on scroll
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.animation = 'fadeInUp 0.6s ease forwards';
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.feature-card, .team-card, .tech-item').forEach(el => {
+            observer.observe(el);
+        });
+    </script>
+    <script src="backend.js"> </script>
+    <script src="backend2.js"> </script>
+    <script src="api.js"></script>
+</body>
+</html>

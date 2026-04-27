@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tiny Tide - Baby Profile</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .container {
+            max-width: 600px;
+            width: 100%;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .profile-card {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1em;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1em;
+            cursor: pointer;
+            font-weight: 600;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102,126,234,0.4);
+        }
+
+        .profile-display {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            display: none;
+        }
+
+        .profile-display.show {
+            display: block;
+        }
+
+        .profile-display h2 {
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+
+        .profile-display p {
+            font-size: 1.1em;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        @media (max-width: 768px) {
+            .profile-card {
+                padding: 25px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🌊 Tiny Tide Baby Profile</h1>
+            <p>Create and view your baby's profile</p>
+        </div>
+
+        <div class="profile-card">
+            <form id="profileForm">
+                <div class="form-group">
+                    <label for="babyName">Baby's Name</label>
+                    <input type="text" id="babyName" placeholder="e.g., Emma" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="babyDOB">Date of Birth</label>
+                    <input type="date" id="babyDOB" required>
+                </div>
+
+                <button type="submit" class="btn">Save Profile</button>
+            </form>
+
+            <div id="profileDisplay" class="profile-display">
+                <h2>👶 Baby Profile</h2>
+                <p id="displayName"></p>
+                <p id="displayDOB"></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const form = document.getElementById('profileForm');
+        const display = document.getElementById('profileDisplay');
+        const displayName = document.getElementById('displayName');
+        const displayDOB = document.getElementById('displayDOB');
+
+        // Load from LocalStorage if exists
+        function loadProfile() {
+            const savedName = localStorage.getItem('babyName');
+            const savedDOB = localStorage.getItem('babyDOB');
+            if (savedName && savedDOB) {
+                displayName.textContent = `Name: ${savedName}`;
+                displayDOB.textContent = `DOB: ${savedDOB}`;
+                display.classList.add('show');
+            }
+        }
+
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const name = document.getElementById('babyName').value.trim();
+            const dob = document.getElementById('babyDOB').value;
+
+            if (name && dob) {
+                localStorage.setItem('babyName', name);
+                localStorage.setItem('babyDOB', dob);
+                loadProfile();
+                form.reset();
+            } else {
+                alert('Please fill in all fields');
+            }
+        });
+
+        loadProfile();
+    </script>
+</body>
+</html>

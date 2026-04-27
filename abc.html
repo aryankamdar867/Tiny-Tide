@@ -1,0 +1,792 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tiny Tide - Vaccination Schedule</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 2rem;
+        }
+
+        .logo {
+            font-size: 3rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        /* Login Card */
+        .login-card {
+            background: white;
+            border-radius: 20px;
+            padding: 3rem;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 450px;
+            margin: 0 auto;
+            animation: slideIn 0.5s ease;
+        }
+
+        .login-card h2 {
+            color: #667eea;
+            margin-bottom: 0.5rem;
+            font-size: 2rem;
+        }
+
+        .login-card p {
+            color: #666;
+            margin-bottom: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #333;
+            font-weight: 600;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102,126,234,0.1);
+        }
+        .dashboard-header {
+    background: white;
+    border-radius: 20px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+}
+
+.logout-btn {
+    background: #f8f9fa;
+    border: 1px solid #ddd;
+    padding: 8px 15px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: 0.3s;
+}
+
+.logout-btn:hover {
+    background: #ffeded;
+    color: #e74c3c;
+    border-color: #e74c3c;
+}
+
+        .btn-login {
+            width: 100%;
+            padding: 1rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-login:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102,126,234,0.4);
+        }
+
+        .demo-info {
+            margin-top: 1.5rem;
+            padding: 1rem;
+            background: #f0f4ff;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+        }
+
+        .demo-info p {
+            margin: 0;
+            font-size: 0.9rem;
+            color: #667eea;
+        }
+
+        /* Dashboard */
+        .dashboard {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .dashboard-header {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .user-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .user-details h2 {
+            color: #667eea;
+            margin-bottom: 0.5rem;
+        }
+
+        .user-details p {
+            color: #666;
+            margin: 0.3rem 0;
+        }
+
+        .btn-logout {
+            padding: 0.8rem 2rem;
+            background: #e74c3c;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-logout:hover {
+            background: #c0392b;
+            transform: translateY(-2px);
+        }
+
+        /* Vaccination Schedule */
+        .schedule-container {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .schedule-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .schedule-header h3 {
+            color: #667eea;
+            font-size: 2rem;
+        }
+
+        .filter-buttons {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .filter-btn {
+            padding: 0.5rem 1.5rem;
+            border: 2px solid #667eea;
+            background: white;
+            color: #667eea;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+        }
+
+        .filter-btn.active {
+            background: #667eea;
+            color: white;
+        }
+
+        .filter-btn:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        .vaccine-timeline {
+            position: relative;
+        }
+
+        .vaccine-item {
+            display: flex;
+            gap: 2rem;
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            background: #f8f9fa;
+            border-radius: 15px;
+            border-left: 5px solid #667eea;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .vaccine-item:hover {
+            transform: translateX(10px);
+            box-shadow: 0 5px 15px rgba(102,126,234,0.2);
+        }
+
+        .vaccine-item.completed {
+            border-left-color: #27ae60;
+            opacity: 0.8;
+        }
+
+        .vaccine-item.upcoming {
+            border-left-color: #f39c12;
+        }
+
+        .vaccine-item.overdue {
+            border-left-color: #e74c3c;
+        }
+
+        .vaccine-age {
+            min-width: 100px;
+            font-weight: bold;
+            color: #667eea;
+            font-size: 1.1rem;
+        }
+
+        .vaccine-details {
+            flex: 1;
+        }
+
+        .vaccine-name {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 0.5rem;
+        }
+
+        .vaccine-description {
+            color: #666;
+            margin-bottom: 0.5rem;
+            line-height: 1.6;
+        }
+
+        .vaccine-date {
+            font-size: 0.9rem;
+            color: #999;
+        }
+
+        .vaccine-status {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .status-badge {
+            padding: 0.4rem 1rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .status-completed {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-upcoming {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-overdue {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .mark-complete-btn {
+            padding: 0.5rem 1rem;
+            background: #27ae60;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .mark-complete-btn:hover {
+            background: #229954;
+            transform: scale(1.05);
+        }
+
+        .no-vaccines {
+            text-align: center;
+            padding: 3rem;
+            color: #999;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 15px;
+            text-align: center;
+        }
+
+        .stat-card.completed {
+            background: linear-gradient(135deg, #27ae60 0%, #229954 100%);
+        }
+
+        .stat-card.upcoming {
+            background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
+        }
+
+        .stat-card.overdue {
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        /* Animations */
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .login-card {
+                padding: 2rem;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .vaccine-item {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .filter-buttons {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .user-info {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="dashboard" class="dashboard" style="display: block;">
+    <div class="dashboard-header">
+        <div>
+            <h2 id="babyNameDisplay">👶 Baby: Loading...</h2>
+        </div>
+        <button onclick="logout()" class="logout-btn">Logout</button>
+    </div>
+
+    <div class="main-grid">
+         </div>
+</div>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="logo">🌊</div>
+            <h1>Tiny Tide</h1>
+            <p>Vaccination Schedule Portal</p>
+        </div>
+
+        <!-- Login Form -->
+        <div id="loginSection" class="login-card">
+            <h2>Welcome Back!</h2>
+            <p>Login to view your baby's vaccination schedule</p>
+            
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="parentId">Parent ID / Email</label>
+                    <input type="text" id="parentId" placeholder="Enter your ID or email" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" placeholder="Enter your password" required>
+                </div>
+                
+                <button type="submit" class="btn-login">Login</button>
+            </form>
+
+            <div class="demo-info">
+                <p><strong>Demo Credentials:</strong></p>
+                <p>ID: parent001 | Password: demo123</p>
+                <p>ID: parent002 | Password: demo123</p>
+            </div>
+        </div>
+
+        <!-- Dashboard -->
+        <div id="dashboard" class="dashboard">
+            <!-- User Info -->
+            <div class="dashboard-header">
+                <div class="user-info">
+                    <div class="user-details">
+                        <h2 id="userName">Welcome, Parent!</h2>
+                        <p id="babyName">👶 Baby: <strong>Not Set</strong></p>
+                        <p id="babyAge">Age: <strong>0 months</strong></p>
+                        <p id="babyDOB">Date of Birth: <strong>--/--/----</strong></p>
+                    </div>
+                    <button class="btn-logout" onclick="logout()">Logout</button>
+                </div>
+            </div>
+
+            <!-- Statistics -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number" id="totalVaccines">0</div>
+                    <div class="stat-label">Total Vaccines</div>
+                </div>
+                <div class="stat-card completed">
+                    <div class="stat-number" id="completedVaccines">0</div>
+                    <div class="stat-label">Completed</div>
+                </div>
+                <div class="stat-card upcoming">
+                    <div class="stat-number" id="upcomingVaccines">0</div>
+                    <div class="stat-label">Upcoming</div>
+                </div>
+                <div class="stat-card overdue">
+                    <div class="stat-number" id="overdueVaccines">0</div>
+                    <div class="stat-label">Overdue</div>
+                </div>
+            </div>
+
+            <!-- Vaccination Schedule -->
+            <div class="schedule-container">
+                <div class="schedule-header">
+                    <h3>📅 Vaccination Schedule</h3>
+                    <div class="filter-buttons">
+                        <button class="filter-btn active" onclick="filterVaccines('all')">All</button>
+                        <button class="filter-btn" onclick="filterVaccines('completed')">Completed</button>
+                        <button class="filter-btn" onclick="filterVaccines('upcoming')">Upcoming</button>
+                        <button class="filter-btn" onclick="filterVaccines('overdue')">Overdue</button>
+                    </div>
+                </div>
+
+                <div id="vaccineTimeline" class="vaccine-timeline">
+                    <!-- Vaccines will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Configuration
+const API_URL = 'http://localhost:3000/api';
+
+// 1. RUN THIS ON PAGE LOAD
+function initGlobalAuth() {
+    const token = localStorage.getItem('token');
+    const babyName = localStorage.getItem('babyName');
+
+    if (!token) {
+        // If no token exists, send them back to the main login page
+        window.location.href = 'mainpage.htm'; 
+        return;
+    }
+
+    // Update the UI with the baby's name saved during login
+    const displayElement = document.getElementById('babyNameDisplay');
+    if (displayElement) {
+        displayElement.innerText = `👶 Baby: ${babyName}`;
+    }
+}
+
+// 2. LOGOUT FUNCTION (Same for all pages)
+function logout() {
+    localStorage.clear(); // Wipes token and baby info
+    window.location.href = 'mainpage.htm';
+}
+
+// Execute immediately
+initGlobalAuth();
+        // Demo user data
+        const users = {
+            'parent001': {
+                password: 'demo123',
+                name: 'Priya Sharma',
+                babyName: 'Aarav Sharma',
+                babyDOB: '2024-06-15',
+                vaccines: [
+                    { age: 'At Birth', name: 'BCG', description: 'Bacillus Calmette-Guérin vaccine for tuberculosis', dueDate: '2024-06-15', completed: true },
+                    { age: 'At Birth', name: 'Hepatitis B (1st dose)', description: 'First dose of Hepatitis B vaccine', dueDate: '2024-06-15', completed: true },
+                    { age: 'At Birth', name: 'OPV-0', description: 'Oral Polio Vaccine (birth dose)', dueDate: '2024-06-15', completed: true },
+                    { age: '6 Weeks', name: 'DTwP/DTaP (1st dose)', description: 'Diphtheria, Tetanus, and Pertussis vaccine', dueDate: '2024-07-27', completed: true },
+                    { age: '6 Weeks', name: 'IPV (1st dose)', description: 'Inactivated Polio Vaccine', dueDate: '2024-07-27', completed: true },
+                    { age: '6 Weeks', name: 'Hib (1st dose)', description: 'Haemophilus influenzae type b vaccine', dueDate: '2024-07-27', completed: true },
+                    { age: '6 Weeks', name: 'Hepatitis B (2nd dose)', description: 'Second dose of Hepatitis B vaccine', dueDate: '2024-07-27', completed: true },
+                    { age: '6 Weeks', name: 'Rotavirus (1st dose)', description: 'Rotavirus vaccine for diarrhea prevention', dueDate: '2024-07-27', completed: true },
+                    { age: '6 Weeks', name: 'PCV (1st dose)', description: 'Pneumococcal Conjugate Vaccine', dueDate: '2024-07-27', completed: true },
+                    { age: '10 Weeks', name: 'DTwP/DTaP (2nd dose)', description: 'Second dose of DTP vaccine', dueDate: '2024-08-24', completed: true },
+                    { age: '10 Weeks', name: 'IPV (2nd dose)', description: 'Second dose of IPV', dueDate: '2024-08-24', completed: true },
+                    { age: '10 Weeks', name: 'Hib (2nd dose)', description: 'Second dose of Hib vaccine', dueDate: '2024-08-24', completed: true },
+                    { age: '10 Weeks', name: 'Rotavirus (2nd dose)', description: 'Second dose of Rotavirus vaccine', dueDate: '2024-08-24', completed: true },
+                    { age: '10 Weeks', name: 'PCV (2nd dose)', description: 'Second dose of PCV', dueDate: '2024-08-24', completed: true },
+                    { age: '14 Weeks', name: 'DTwP/DTaP (3rd dose)', description: 'Third dose of DTP vaccine', dueDate: '2024-09-21', completed: false },
+                    { age: '14 Weeks', name: 'IPV (3rd dose)', description: 'Third dose of IPV', dueDate: '2024-09-21', completed: false },
+                    { age: '14 Weeks', name: 'Hib (3rd dose)', description: 'Third dose of Hib vaccine', dueDate: '2024-09-21', completed: false },
+                    { age: '14 Weeks', name: 'Hepatitis B (3rd dose)', description: 'Third dose of Hepatitis B vaccine', dueDate: '2024-09-21', completed: false },
+                    { age: '14 Weeks', name: 'Rotavirus (3rd dose)', description: 'Third dose of Rotavirus vaccine', dueDate: '2024-09-21', completed: false },
+                    { age: '14 Weeks', name: 'PCV (3rd dose)', description: 'Third dose of PCV', dueDate: '2024-09-21', completed: false },
+                    { age: '6 Months', name: 'OPV-1', description: 'First dose of Oral Polio Vaccine', dueDate: '2024-12-15', completed: false },
+                    { age: '6 Months', name: 'Influenza (1st dose)', description: 'Annual flu vaccine', dueDate: '2024-12-15', completed: false },
+                    { age: '9 Months', name: 'MMR (1st dose)', description: 'Measles, Mumps, and Rubella vaccine', dueDate: '2025-03-15', completed: false },
+                    { age: '9 Months', name: 'OPV-2', description: 'Second dose of OPV', dueDate: '2025-03-15', completed: false },
+                ]
+            },
+            'parent002': {
+                password: 'demo123',
+                name: 'Rahul Mehta',
+                babyName: 'Anaya Mehta',
+                babyDOB: '2024-09-10',
+                vaccines: [
+                    { age: 'At Birth', name: 'BCG', description: 'Bacillus Calmette-Guérin vaccine for tuberculosis', dueDate: '2024-09-10', completed: true },
+                    { age: 'At Birth', name: 'Hepatitis B (1st dose)', description: 'First dose of Hepatitis B vaccine', dueDate: '2024-09-10', completed: true },
+                    { age: 'At Birth', name: 'OPV-0', description: 'Oral Polio Vaccine (birth dose)', dueDate: '2024-09-10', completed: true },
+                    { age: '6 Weeks', name: 'DTwP/DTaP (1st dose)', description: 'Diphtheria, Tetanus, and Pertussis vaccine', dueDate: '2024-10-22', completed: true },
+                    { age: '6 Weeks', name: 'IPV (1st dose)', description: 'Inactivated Polio Vaccine', dueDate: '2024-10-22', completed: true },
+                    { age: '6 Weeks', name: 'Hib (1st dose)', description: 'Haemophilus influenzae type b vaccine', dueDate: '2024-10-22', completed: true },
+                    { age: '6 Weeks', name: 'Hepatitis B (2nd dose)', description: 'Second dose of Hepatitis B vaccine', dueDate: '2024-10-22', completed: true },
+                    { age: '6 Weeks', name: 'Rotavirus (1st dose)', description: 'Rotavirus vaccine for diarrhea prevention', dueDate: '2024-10-22', completed: true },
+                    { age: '6 Weeks', name: 'PCV (1st dose)', description: 'Pneumococcal Conjugate Vaccine', dueDate: '2024-10-22', completed: true },
+                    { age: '10 Weeks', name: 'DTwP/DTaP (2nd dose)', description: 'Second dose of DTP vaccine', dueDate: '2024-11-19', completed: true },
+                    { age: '10 Weeks', name: 'IPV (2nd dose)', description: 'Second dose of IPV', dueDate: '2024-11-19', completed: true },
+                    { age: '10 Weeks', name: 'Hib (2nd dose)', description: 'Second dose of Hib vaccine', dueDate: '2024-11-19', completed: true },
+                    { age: '10 Weeks', name: 'Rotavirus (2nd dose)', description: 'Second dose of Rotavirus vaccine', dueDate: '2024-11-19', completed: true },
+                    { age: '10 Weeks', name: 'PCV (2nd dose)', description: 'Second dose of PCV', dueDate: '2024-11-19', completed: true },
+                    { age: '14 Weeks', name: 'DTwP/DTaP (3rd dose)', description: 'Third dose of DTP vaccine', dueDate: '2024-12-17', completed: false },
+                    { age: '14 Weeks', name: 'IPV (3rd dose)', description: 'Third dose of IPV', dueDate: '2024-12-17', completed: false },
+                    { age: '14 Weeks', name: 'Hib (3rd dose)', description: 'Third dose of Hib vaccine', dueDate: '2024-12-17', completed: false },
+                    { age: '14 Weeks', name: 'Hepatitis B (3rd dose)', description: 'Third dose of Hepatitis B vaccine', dueDate: '2024-12-17', completed: false },
+                    { age: '14 Weeks', name: 'Rotavirus (3rd dose)', description: 'Third dose of Rotavirus vaccine', dueDate: '2024-12-17', completed: false },
+                    { age: '14 Weeks', name: 'PCV (3rd dose)', description: 'Third dose of PCV', dueDate: '2024-12-17', completed: false },
+                ]
+            }
+        };
+
+        let currentUser = null;
+        let currentFilter = 'all';
+
+        // Login functionality
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const parentId = document.getElementById('parentId').value.trim();
+            const password = document.getElementById('password').value;
+            
+            if (users[parentId] && users[parentId].password === password) {
+                currentUser = users[parentId];
+                showDashboard();
+            } else {
+                alert('Invalid credentials! Please try demo credentials.');
+            }
+        });
+
+        function showDashboard() {
+            document.getElementById('loginSection').style.display = 'none';
+            document.getElementById('dashboard').style.display = 'block';
+            
+            // Update user info
+            document.getElementById('userName').textContent = `Welcome, ${currentUser.name}!`;
+            document.getElementById('babyName').innerHTML = `👶 Baby: <strong>${currentUser.babyName}</strong>`;
+            
+            const dob = new Date(currentUser.babyDOB);
+            const today = new Date();
+            const ageMonths = Math.floor((today - dob) / (1000 * 60 * 60 * 24 * 30));
+            document.getElementById('babyAge').innerHTML = `Age: <strong>${ageMonths} months</strong>`;
+            document.getElementById('babyDOB').innerHTML = `Date of Birth: <strong>${formatDate(currentUser.babyDOB)}</strong>`;
+            
+            // Load vaccines
+            loadVaccines();
+            updateStats();
+        }
+
+        function loadVaccines() {
+            const timeline = document.getElementById('vaccineTimeline');
+            timeline.innerHTML = '';
+            
+            const today = new Date();
+            const filteredVaccines = currentUser.vaccines.filter(vaccine => {
+                const dueDate = new Date(vaccine.dueDate);
+                
+                if (currentFilter === 'all') return true;
+                if (currentFilter === 'completed') return vaccine.completed;
+                if (currentFilter === 'upcoming') return !vaccine.completed && dueDate >= today;
+                if (currentFilter === 'overdue') return !vaccine.completed && dueDate < today;
+                
+                return true;
+            });
+            
+            if (filteredVaccines.length === 0) {
+                timeline.innerHTML = '<div class="no-vaccines">No vaccines found for this filter</div>';
+                return;
+            }
+            
+            filteredVaccines.forEach((vaccine, index) => {
+                const dueDate = new Date(vaccine.dueDate);
+                const status = getVaccineStatus(vaccine, dueDate);
+                
+                const vaccineItem = document.createElement('div');
+                vaccineItem.className = `vaccine-item ${status}`;
+                vaccineItem.innerHTML = `
+                    <div class="vaccine-age">${vaccine.age}</div>
+                    <div class="vaccine-details">
+                        <div class="vaccine-name">${vaccine.name}</div>
+                        <div class="vaccine-description">${vaccine.description}</div>
+                        <div class="vaccine-date">Due Date: ${formatDate(vaccine.dueDate)}</div>
+                    </div>
+                    <div class="vaccine-status">
+                        <span class="status-badge status-${status}">
+                            ${status === 'completed' ? '✓ Completed' : 
+                              status === 'upcoming' ? '⏳ Upcoming' : 
+                              '⚠️ Overdue'}
+                        </span>
+                        ${!vaccine.completed ? 
+                            `<button class="mark-complete-btn" onclick="markComplete(${index})">Mark Complete</button>` : 
+                            ''}
+                    </div>
+                `;
+                
+                timeline.appendChild(vaccineItem);
+            });
+        }
+
+        function getVaccineStatus(vaccine, dueDate) {
+            if (vaccine.completed) return 'completed';
+            
+            const today = new Date();
+            return dueDate < today ? 'overdue' : 'upcoming';
+        }
+
+        function updateStats() {
+            const total = currentUser.vaccines.length;
+            const completed = currentUser.vaccines.filter(v => v.completed).length;
+            const today = new Date();
+            const upcoming = currentUser.vaccines.filter(v => !v.completed && new Date(v.dueDate) >= today).length;
+            const overdue = currentUser.vaccines.filter(v => !v.completed && new Date(v.dueDate) < today).length;
+            
+            document.getElementById('totalVaccines').textContent = total;
+            document.getElementById('completedVaccines').textContent = completed;
+            document.getElementById('upcomingVaccines').textContent = upcoming;
+            document.getElementById('overdueVaccines').textContent = overdue;
+        }
+
+        function filterVaccines(filter) {
+            currentFilter = filter;
+            
+            // Update button states
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            loadVaccines();
+        }
+
+        function markComplete(index) {
+            currentUser.vaccines[index].completed = true;
+            loadVaccines();
+            updateStats();
+            
+            // Show success message
+            alert(`✓ ${currentUser.vaccines[index].name} marked as completed!`);
+        }
+
+        function logout() {
+            currentUser = null;
+            currentFilter = 'all';
+            document.getElementById('dashboard').style.display = 'none';
+            document.getElementById('loginSection').style.display = 'block';
+            document.getElementById('loginForm').reset();
+        }
+
+        function formatDate(dateStr) {
+            const date = new Date(dateStr);
+            const options = { day: 'numeric', month: 'short', year: 'numeric' };
+            return date.toLocaleDateString('en-IN', options);
+        }
+        
+    </script>
+    <script src="api.js"></script>
+</body>
+</html>

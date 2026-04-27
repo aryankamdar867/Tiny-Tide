@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tiny Tide - Vaccines</title>
+    <style>
+        :root { --primary: #667eea; --secondary: #764ba2; --success: #27ae60; --danger: #e74c3c; }
+        body { font-family: 'Segoe UI', sans-serif; background: linear-gradient(135deg, var(--primary), var(--secondary)); min-height: 100vh; padding: 20px; color: #333; }
+        .card { background: white; border-radius: 15px; padding: 2rem; max-width: 800px; margin: 20px auto; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
+        h1, h2 { color: var(--primary); text-align: center; }
+        
+        /* Form Styling */
+        .form-group { margin-bottom: 1rem; }
+        input { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; margin-top: 5px; }
+        .btn { width: 100%; padding: 12px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; transition: 0.3s; margin-top: 10px; }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-success { background: var(--success); color: white; }
+        .btn-logout { background: var(--danger); color: white; width: auto; float: right; }
+
+        /* Age Recommender Styling */
+        .age-box { background: #eef2ff; padding: 20px; border-radius: 12px; margin-bottom: 25px; border: 2px solid #667eea; }
+        .rec-card { background: white; padding: 12px; border-radius: 8px; margin-top: 10px; border-left: 4px solid var(--success); }
+        .rec-card b { color: var(--primary); display: block; margin-bottom: 4px; }
+        .rec-card span { font-size: 0.9rem; color: #555; }
+
+        /* Vaccine Item Styling */
+        .vaccine-item { display: flex; justify-content: space-between; align-items: center; padding: 15px; border-bottom: 1px solid #eee; transition: 0.2s; }
+        .vaccine-item:hover { background: #f9f9f9; }
+        .vaccine-info h4 { margin: 0; color: #444; }
+        .vaccine-info p { margin: 5px 0 0; font-size: 0.9rem; color: #777; }
+        .completed { opacity: 0.6; text-decoration: line-through; }
+        
+        #dashboard { display: none; }
+    </style>
+</head>
+<body>
+
+    <div id="loginSection" class="card">
+        <h1>🌊 Tiny Tide</h1>
+        <h2>Vaccine Tracker</h2>
+        <form id="loginForm">
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" id="email" required>
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" id="password" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Login to View Schedule</button>
+        </form>
+    </div>
+
+    <div id="dashboard" class="card">
+        <button class="btn btn-logout" onclick="logout()">Logout</button>
+        <h2 id="welcomeText">Baby's Vaccines</h2>
+        <hr><br>
+
+        <div class="age-box">
+            <h4>📅 Quick Recommendation</h4>
+            <p style="font-size: 0.9rem; color: #555;">Enter baby's age in months to see what's needed:</p>
+            <input type="number" id="checkAge" placeholder="Enter age (e.g. 6)" oninput="recommendByAge()">
+            <div id="recommendationResults"></div>
+        </div>
+
+        <div style="background: #f0f2f5; padding: 15px; border-radius: 10px; margin-bottom: 20px;">
+            <h4>Add New Vaccination Record</h4>
+            <div class="form-group">
+                <input type="text" id="vName" placeholder="Vaccine Name (e.g. Polio)">
+                <input type="date" id="vDate">
+            </div>
+            <button class="btn btn-success" onclick="addVaccine()">+ Add to Record</button>
+        </div>
+
+        <div id="vaccineList"></div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:3000/api';
+
+        // Reference Data
+        const VACCINE_DATABASE = [
+            { age: 0, name: "BCG, Hep B, OPV 0", info: "Birth dose. Protects against TB, Liver infection, and Polio." },
+            { age: 1.5, name: "Pentavalent 1, OPV 1, PCV 1", info: "Protects against 5 diseases including Tetanus, plus Pneumonia." },
+            { age: 2.5, name: "Pentavalent 2, OPV 2", info: "Second booster dose for core immunity." },
+            { age: 3.5, name: "Pentavalent 3, OPV 3, PCV 2", info: "Final primary dose for infant protection." },
+            { age: 6, name: "Vitamin A (Dose 1)", info: "Essential for healthy vision and immunity." },
+            { age: 9, name: "Measles & Rubella (MR) 1", info: "Protects against fever and viral rashes." },
+            { age: 18, name: "DPT Booster, OPV Booster", info: "Re-strengthens protection as the child begins walking." }
+        ];
+
+        function recommendByAge() {
+            const ageInput = document.getElementById('checkAge').value;
+            const resultsDiv = document.getElementById('recommendationResults');
+            resultsDiv.innerHTML = '';
+
+            if (ageInput === "") return;
+
+            // Find all vaccines appropriate for that age or younger
+            const recommendations = VACCINE_DATABASE.filter(v => ageInput >= v.age);
+
+            if (recommendations.length === 0) {
+                resultsDiv.innerHTML = "<p style='margin-top:10px;'>No specific vaccines for this age yet.</p>";
+            } else {
+                recommendations.forEach(v => {
+                    const div = document.createElement('div');
+                    div.className = 'rec-card';
+                    div.innerHTML = `<b>${v.name} (Age: ${v.age}mo)</b> <span>${v.info}</span>`;
+                    resultsDiv.appendChild(div);
+                });
+            }
+        }
+
+        // --- AUTH: LOGIN ---
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            const res = await fetch(`${API_URL}/login`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, password })
+            });
+            const data = await res.json();
+
+            if (res.ok) {
+                localStorage.setItem('token', data.token);
+                localStorage.setItem('babyName', data.babyName);
+                checkAuth();
+            } else {
+                alert(data.error);
+            }
+        });
+
+        // --- DATA: FETCH VACCINES ---
+        async function loadVaccines() {
+            const token = localStorage.getItem('token');
+            const res = await fetch(`${API_URL}/vaccines`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            const vaccines = await res.json();
+            renderVaccines(vaccines);
+        }
+
+        // --- DATA: ADD VACCINE ---
+        async function addVaccine() {
+            const name = document.getElementById('vName').value;
+            const date = document.getElementById('vDate').value;
+            const token = localStorage.getItem('token');
+
+            if(!name || !date) return alert("Fill in name and date");
+
+            await fetch(`${API_URL}/vaccines`, {
+                method: 'POST',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({ name, date, completed: false })
+            });
+            
+            document.getElementById('vName').value = '';
+            loadVaccines();
+        }
+
+        // --- UI: RENDER LIST ---
+        function renderVaccines(list) {
+            const container = document.getElementById('vaccineList');
+            container.innerHTML = list.length === 0 ? '<p>No records saved yet.</p>' : '';
+            
+            list.forEach(v => {
+                const div = document.createElement('div');
+                div.className = `vaccine-item ${v.completed ? 'completed' : ''}`;
+                div.innerHTML = `
+                    <div class="vaccine-info">
+                        <h4>${v.name}</h4>
+                        <p>Given on: ${new Date(v.date).toLocaleDateString()}</p>
+                    </div>
+                    <button class="btn" style="width: auto; background: ${v.completed ? '#ddd' : '#27ae60'}; color: white;" 
+                        onclick="toggleVaccine('${v._id}')">
+                        ${v.completed ? '✓ Done' : 'Mark Done'}
+                    </button>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        // --- DATA: TOGGLE STATUS ---
+        async function toggleVaccine(id) {
+            const token = localStorage.getItem('token');
+            await fetch(`${API_URL}/vaccines/${id}`, {
+                method: 'PATCH',
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            loadVaccines();
+        }
+
+        function checkAuth() {
+            if (localStorage.getItem('token')) {
+                document.getElementById('loginSection').style.display = 'none';
+                document.getElementById('dashboard').style.display = 'block';
+                document.getElementById('welcomeText').innerText = `${localStorage.getItem('babyName')}'s Tracker`;
+                loadVaccines();
+            }
+        }
+
+        function logout() {
+            localStorage.clear();
+            location.reload();
+        }
+
+        checkAuth();
+    </script>
+</body>
+</html>

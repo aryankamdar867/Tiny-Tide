@@ -1,0 +1,265 @@
+
+
+Skip to content
+Using Gmail with screen readers
+1 of 4,219
+(no subject)
+Inbox
+
+Aryan Kamdar <aryankamdar0867@gmail.com>
+Attachments
+18:27 (3 minutes ago)
+to me
+
+ 4 attachment
+  •  Scanned by Gmail
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Smart Care Alerts | Tiny Tide</title>
+
+<style>
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #f5f7fa;
+    color: #333;
+}
+
+/* Header */
+header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 40px 20px;
+    text-align: center;
+    color: white;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+}
+
+header h1 {
+    font-size: 36px;
+}
+
+header p {
+    margin-top: 10px;
+    font-size: 16px;
+    opacity: 0.95;
+}
+
+/* Layout */
+.wrapper {
+    max-width: 1000px;
+    margin: 60px auto;
+    padding: 20px;
+}
+
+/* Profile Card */
+.profile-card {
+    background: white;
+    border-radius: 18px;
+    padding: 30px;
+    box-shadow: 0 10px 30px rgba(102,126,234,0.25);
+    margin-bottom: 40px;
+}
+
+.profile-card h2 {
+    color: #667eea;
+    margin-bottom: 10px;
+}
+
+.profile-card p {
+    color: #666;
+}
+
+.profile-card input,
+.profile-card button {
+    width: 100%;
+    padding: 14px;
+    margin-top: 15px;
+    border-radius: 12px;
+    font-size: 15px;
+}
+
+.profile-card input {
+    border: 1px solid #ccc;
+}
+
+.profile-card button {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s;
+}
+
+.profile-card button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(102,126,234,0.4);
+}
+
+/* Alerts */
+.alerts-title {
+    font-size: 28px;
+    margin-bottom: 25px;
+    color: #667eea;
+}
+
+.alert-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 25px;
+}
+
+.alert {
+    background: white;
+    border-left: 6px solid #667eea;
+    padding: 20px;
+    border-radius: 15px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+    animation: fadeInUp 0.4s ease;
+}
+
+.alert strong {
+    font-size: 16px;
+    color: #333;
+}
+
+.alert span {
+    display: block;
+    font-size: 14px;
+    margin-top: 8px;
+    color: #666;
+}
+
+/* Footer Note */
+.note {
+    margin-top: 40px;
+    text-align: center;
+    font-size: 14px;
+    color: #666;
+}
+
+/* Animation */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(25px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <h1>Smart Care Alerts</h1>
+    <p>Personalized notifications that grow with your baby</p>
+</header>
+
+<div class="wrapper">
+
+    <div class="profile-card">
+        <h2>Baby Profile Setup</h2>
+        <p>Enter your baby's date of birth to activate smart alerts.</p>
+        <input type="date" id="dob">
+        <button onclick="saveProfile()">Save Baby Profile</button>
+    </div>
+
+    <h2 class="alerts-title">Today's Care Alerts</h2>
+    <div class="alert-grid" id="alertGrid"></div>
+
+    <p class="note">
+        Alerts automatically update as your baby grows — no manual changes needed.
+    </p>
+
+</div>
+
+<script>
+function saveProfile() {
+    const dob = document.getElementById("dob").value;
+    if (!dob) {
+        alert("Please select Date of Birth");
+        return;
+    }
+    localStorage.setItem("babyDOB", dob);
+    generateAlerts();
+}
+
+function calculateMonths(dob) {
+    const birthDate = new Date(dob);
+    const today = new Date();
+    let months = (today.getFullYear() - birthDate.getFullYear()) * 12;
+    months += today.getMonth() - birthDate.getMonth();
+    return Math.max(months, 0);
+}
+
+function generateAlerts() {
+    const grid = document.getElementById("alertGrid");
+    grid.innerHTML = "";
+
+    const dob = localStorage.getItem("babyDOB");
+    if (!dob) {
+        grid.innerHTML = "<p>Please add baby profile to view alerts.</p>";
+        return;
+    }
+
+    const age = calculateMonths(dob);
+    const alerts = [];
+
+    alerts.push({
+        title: "Feeding Routine",
+        desc: age <= 6 ? "Feed every 3–4 hours" : "Milk + solids as per schedule"
+    });
+
+    alerts.push({
+        title: "Diaper Care",
+        desc: age <= 6 ? "Change every 3 hours" : "Check every 4–5 hours"
+    });
+
+    alerts.push({
+        title: "Sleep Pattern",
+        desc: age <= 6 ? "Multiple naps recommended" : "2 structured naps daily"
+    });
+
+    let vaccineMsg = "Follow booster vaccination plan";
+    if (age < 2) vaccineMsg = "Upcoming at 2 months (DTP, OPV)";
+    else if (age < 4) vaccineMsg = "Upcoming at 4 months (DTP 2)";
+    else if (age < 6) vaccineMsg = "Upcoming at 6 months (DTP 3)";
+    else if (age < 9) vaccineMsg = "Upcoming at 9 months (MR Vaccine)";
+
+    alerts.push({
+        title: "Vaccination Reminder",
+        desc: vaccineMsg
+    });
+
+    alerts.push({
+        title: "Health Check",
+        desc: "Track temperature & growth regularly"
+    });
+
+    alerts.forEach(a => {
+        const card = document.createElement("div");
+        card.className = "alert";
+        card.innerHTML = `<strong>${a.title}</strong><span>${a.desc}</span>`;
+        grid.appendChild(card);
+    });
+}
+
+generateAlerts();
+</script>
+
+</body>
+</html>
+notifications.html
+Displaying babyprofile.html.

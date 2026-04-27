@@ -1,0 +1,79 @@
+const questionInput = document.getElementById('questionInput');
+        const askBtn = document.getElementById('askBtn');
+        const answerBox = document.getElementById('answerBox');
+        const answerText = document.getElementById('answerText');
+
+        askBtn.addEventListener('click', askQuestion);
+        questionInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                askQuestion();
+            }
+        });
+
+        async function askQuestion() {
+            const question = questionInput.value.trim();
+            if (!question) {
+                alert('Please enter a question');
+                return;
+            }
+
+            const babyName = document.getElementById('babyName').value;
+            const babyAge = document.getElementById('babyAge').value;
+            const babyGender = document.getElementById('babyGender').value;
+            const babyWeight = document.getElementById('babyWeight').value;
+            const feedingType = document.getElementById('feedingType').value;
+            const specialNotes = document.getElementById('specialNotes').value;
+
+            askBtn.disabled = true;
+            questionInput.disabled = true;
+            answerBox.classList.add('show');
+            answerText.innerHTML = '<div class="loading">🤔 Thinking...</div>';
+
+            let profileContext = '';
+            if (babyName || babyAge || babyGender || babyWeight || feedingType) {
+                profileContext = `\n\nBaby Profile:`;
+                if (babyName) profileContext += `\n- Name: ${babyName}`;
+                if (babyAge) profileContext += `\n- Age: ${babyAge} months`;
+                if (babyGender) profileContext += `\n- Gender: ${babyGender}`;
+                if (babyWeight) profileContext += `\n- Weight: ${babyWeight} kg`;
+                if (feedingType) profileContext += `\n- Feeding Type: ${feedingType}`;
+                if (specialNotes) profileContext += `\n- Special Notes: ${specialNotes}`;
+            }
+
+            try {
+                const response = await fetch('https://api.anthropic.com/v1/messages', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        model: 'claude-sonnet-4-20250514',
+                        max_tokens: 1000,
+                        messages: [{
+                            role: 'user',
+                            content: `You are a helpful baby care assistant. ${profileContext}
+
+Question: ${question}
+
+Please provide helpful, evidence-based advice tailored to this baby's information. Keep your response concise, friendly, and actionable. Always remind parents to consult their pediatrician for serious concerns.`
+                        }]
+                    })
+                });
+
+                const data = await response.json();
+                
+                if (data.content && data.content.length > 0) {
+                    const answer = data.content.find(item => item.type === 'text')?.text || 'Sorry, I could not generate a response.';
+                    answerText.textContent = answer;
+                } else {
+                    answerText.textContent = '❌ Sorry, there was an error processing your question. Please try again.';
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                answerText.textContent = '❌ Sorry, there was an error processing your question. Please try again.';
+            }
+
+            askBtn.disabled = false;
+            questionInput.disabled = false;
+        }
